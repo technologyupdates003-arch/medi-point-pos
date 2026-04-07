@@ -1,27 +1,46 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { AppProvider, useApp } from './store/AppContext';
+import LoginPage from './pages/LoginPage';
+import POSPage from './pages/POSPage';
+import InventoryPage from './pages/InventoryPage';
+import DashboardPage from './pages/DashboardPage';
+import SalesPage from './pages/SalesPage';
+import UsersPage from './pages/UsersPage';
+import AlertsPage from './pages/AlertsPage';
+import AppLayout from './components/AppLayout';
 
-const queryClient = new QueryClient();
+function AuthenticatedRoutes() {
+  const { currentUser } = useApp();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
+  if (!currentUser) return <LoginPage />;
+
+  const isAdmin = currentUser.role === 'admin';
+  const defaultPath = isAdmin ? '/dashboard' : '/pos';
+
+  return (
+    <AppLayout>
+      <Routes>
+        <Route path="/" element={<Navigate to={defaultPath} replace />} />
+        {isAdmin && <Route path="/dashboard" element={<DashboardPage />} />}
+        <Route path="/pos" element={<POSPage />} />
+        {isAdmin && <Route path="/inventory" element={<InventoryPage />} />}
+        <Route path="/sales" element={<SalesPage />} />
+        {isAdmin && <Route path="/users" element={<UsersPage />} />}
+        <Route path="/alerts" element={<AlertsPage />} />
+        <Route path="*" element={<Navigate to={defaultPath} replace />} />
+      </Routes>
+    </AppLayout>
+  );
+}
+
+export default function App() {
+  return (
+    <AppProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          <Route path="/*" element={<AuthenticatedRoutes />} />
         </Routes>
       </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+    </AppProvider>
+  );
+}
