@@ -4,34 +4,37 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 const COLORS = ['hsl(210,60%,50%)', 'hsl(120,45%,42%)', 'hsl(40,90%,50%)', 'hsl(0,70%,50%)', 'hsl(280,50%,50%)'];
 
 export default function DashboardPage() {
-  const { products, transactions } = useApp();
+  const { products, transactions, currentBranchId, branches } = useApp();
   const now = new Date();
   const todayStr = now.toISOString().split('T')[0];
 
-  const todayTx = transactions.filter(t => t.date.startsWith(todayStr));
-  const todayRevenue = todayTx.reduce((s, t) => s + t.total, 0);
-  const totalRevenue = transactions.reduce((s, t) => s + t.total, 0);
-  const lowStock = products.filter(p => p.stock < 10);
-  const expired = products.filter(p => new Date(p.expiryDate) < now);
+  const filteredProducts = currentBranchId ? products.filter(p => p.branchId === currentBranchId) : products;
+  const filteredTx = currentBranchId ? transactions.filter(t => t.branchId === currentBranchId) : transactions;
 
-  // Daily sales for last 7 days
+  const todayTx = filteredTx.filter(t => t.date.startsWith(todayStr));
+  const todayRevenue = todayTx.reduce((s, t) => s + t.total, 0);
+  const totalRevenue = filteredTx.reduce((s, t) => s + t.total, 0);
+  const lowStock = filteredProducts.filter(p => p.stock < 10);
+  const expired = filteredProducts.filter(p => new Date(p.expiryDate) < now);
+
   const dailySales = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(now);
     d.setDate(d.getDate() - (6 - i));
     const ds = d.toISOString().split('T')[0];
-    const total = transactions.filter(t => t.date.startsWith(ds)).reduce((s, t) => s + t.total, 0);
+    const total = filteredTx.filter(t => t.date.startsWith(ds)).reduce((s, t) => s + t.total, 0);
     return { day: ds.slice(5), total };
   });
 
-  // Top products
   const productSales: Record<string, number> = {};
-  transactions.forEach(t => t.items.forEach(item => {
+  filteredTx.forEach(t => t.items.forEach(item => {
     productSales[item.name] = (productSales[item.name] || 0) + item.qty;
   }));
   const topProducts = Object.entries(productSales)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
     .map(([name, qty]) => ({ name: name.length > 15 ? name.slice(0, 15) + '…' : name, qty }));
+
+  const currentBranch = branches.find(b => b.id === currentBranchId);
 
   const cards = [
     { label: "Today's Sales", value: todayTx.length, color: 'hsl(210,60%,50%)' },
@@ -42,9 +45,8 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="win7-titlebar">📊 Admin Dashboard</div>
+      <div className="win7-titlebar">📊 Admin Dashboard {currentBranch ? `— ${currentBranch.name}` : '— All Branches'}</div>
       <div className="win7-panel" style={{ borderTop: 'none', padding: 16 }}>
-        {/* Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
           {cards.map(c => (
             <div key={c.label} className="win7-card" style={{ borderLeft: `4px solid ${c.color}` }}>
@@ -53,8 +55,6 @@ export default function DashboardPage() {
             </div>
           ))}
         </div>
-
-        {/* Charts */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div>
             <div className="win7-titlebar" style={{ fontSize: 12 }}>Daily Sales (7 Days)</div>
