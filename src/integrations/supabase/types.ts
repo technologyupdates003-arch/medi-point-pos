@@ -14,7 +14,186 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_users: {
+        Row: {
+          branch_id: string | null
+          created_at: string
+          id: string
+          name: string
+          password: string
+          role: string
+          username: string
+        }
+        Insert: {
+          branch_id?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          password: string
+          role?: string
+          username: string
+        }
+        Update: {
+          branch_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          password?: string
+          role?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_users_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      branches: {
+        Row: {
+          address: string | null
+          created_at: string
+          id: string
+          name: string
+          phone: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          phone?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      business_settings: {
+        Row: {
+          address: string | null
+          business_name: string
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          business_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          business_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          barcode: string | null
+          branch_id: string | null
+          buying_price: number
+          category: string
+          created_at: string
+          expiry_date: string | null
+          id: string
+          name: string
+          selling_price: number
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          barcode?: string | null
+          branch_id?: string | null
+          buying_price?: number
+          category?: string
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          name: string
+          selling_price?: number
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          barcode?: string | null
+          branch_id?: string | null
+          buying_price?: number
+          category?: string
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          name?: string
+          selling_price?: number
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          balance: number
+          branch_id: string | null
+          cash_paid: number
+          cashier: string
+          created_at: string
+          date: string
+          id: string
+          items: Json
+          total: number
+        }
+        Insert: {
+          balance?: number
+          branch_id?: string | null
+          cash_paid?: number
+          cashier?: string
+          created_at?: string
+          date?: string
+          id?: string
+          items?: Json
+          total?: number
+        }
+        Update: {
+          balance?: number
+          branch_id?: string | null
+          cash_paid?: number
+          cashier?: string
+          created_at?: string
+          date?: string
+          id?: string
+          items?: Json
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

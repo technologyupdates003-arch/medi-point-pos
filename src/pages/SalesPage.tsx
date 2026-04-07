@@ -4,13 +4,14 @@ import { Transaction } from '../store/mockData';
 import { Printer } from 'lucide-react';
 
 export default function SalesPage() {
-  const { transactions } = useApp();
+  const { transactions, businessSettings, currentBranchId } = useApp();
   const [dateFilter, setDateFilter] = useState('');
   const [viewing, setViewing] = useState<Transaction | null>(null);
 
+  const branchTx = currentBranchId ? transactions.filter(t => t.branchId === currentBranchId) : transactions;
   const filtered = dateFilter
-    ? transactions.filter(t => t.date.startsWith(dateFilter))
-    : transactions;
+    ? branchTx.filter(t => t.date.startsWith(dateFilter))
+    : branchTx;
 
   return (
     <div>
@@ -60,33 +61,45 @@ export default function SalesPage() {
 
       {viewing && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={() => setViewing(null)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 2 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: 2, width: 302 }}>
             <div className="win7-titlebar" style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Receipt — {viewing.id}</span>
               <button onClick={() => setViewing(null)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>✕</button>
             </div>
-            <div className="receipt" style={{ padding: 20 }}>
-              <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 14 }}>💊 PHARMACY POS</div>
-              <div style={{ textAlign: 'center', fontSize: 11 }}>123 Health Street, Medical City</div>
-              <div style={{ borderBottom: '1px dashed #ccc', margin: '8px 0' }} />
-              <div style={{ fontSize: 11 }}>Date: {new Date(viewing.date).toLocaleString()}</div>
-              <div style={{ fontSize: 11 }}>Receipt #: {viewing.id}</div>
-              <div style={{ fontSize: 11 }}>Cashier: {viewing.cashier}</div>
-              <div style={{ borderBottom: '1px dashed #ccc', margin: '8px 0' }} />
-              <table style={{ width: '100%', fontSize: 11 }}>
-                <thead><tr><th style={{ textAlign: 'left' }}>Item</th><th>Qty</th><th>Price</th><th style={{ textAlign: 'right' }}>Sub</th></tr></thead>
-                <tbody>
-                  {viewing.items.map((item, i) => (
-                    <tr key={i}><td>{item.name}</td><td style={{ textAlign: 'center' }}>{item.qty}</td><td style={{ textAlign: 'center' }}>${item.price.toFixed(2)}</td><td style={{ textAlign: 'right' }}>${item.subtotal.toFixed(2)}</td></tr>
-                  ))}
-                </tbody>
-              </table>
-              <div style={{ borderBottom: '1px dashed #ccc', margin: '8px 0' }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}><span>TOTAL</span><span>${viewing.total.toFixed(2)}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}><span>Cash</span><span>${viewing.cashPaid.toFixed(2)}</span></div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}><span>Balance</span><span>${viewing.balance.toFixed(2)}</span></div>
+            <div className="receipt" style={{ padding: '12px 10px', fontFamily: 'monospace', fontSize: 11, width: 280 }}>
+              <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 13 }}>💊 {businessSettings.businessName}</div>
+              <div style={{ textAlign: 'center', fontSize: 10 }}>{businessSettings.address}</div>
+              {businessSettings.phone && <div style={{ textAlign: 'center', fontSize: 10 }}>{businessSettings.phone}</div>}
+              <div style={{ borderBottom: '1px dashed #000', margin: '6px 0' }} />
+              <div style={{ fontSize: 10 }}>Date: {new Date(viewing.date).toLocaleString()}</div>
+              <div style={{ fontSize: 10 }}>Receipt #: {viewing.id}</div>
+              <div style={{ fontSize: 10 }}>Cashier: {viewing.cashier}</div>
+              <div style={{ borderBottom: '1px dashed #000', margin: '6px 0' }} />
+              {viewing.items.map((item, i) => (
+                <div key={i} style={{ marginBottom: 2 }}>
+                  <div style={{ fontSize: 10 }}>{item.name}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                    <span>{item.qty} x ${item.price.toFixed(2)}</span>
+                    <span>${item.subtotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              ))}
+              <div style={{ borderBottom: '1px dashed #000', margin: '6px 0' }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 12 }}>
+                <span>TOTAL</span><span>${viewing.total.toFixed(2)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                <span>Cash</span><span>${viewing.cashPaid.toFixed(2)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                <span>Balance</span><span>${viewing.balance.toFixed(2)}</span>
+              </div>
+              <div style={{ borderBottom: '1px dashed #000', margin: '6px 0' }} />
+              <div style={{ textAlign: 'center', fontSize: 9 }}>Thank you for your purchase!</div>
+              <div style={{ textAlign: 'center', fontSize: 8, marginTop: 4, color: '#666' }}>Powered by Abancool Technology</div>
+              <div style={{ textAlign: 'center', fontSize: 8, color: '#666' }}>0728825152 / 01116679286</div>
             </div>
-            <div style={{ padding: '8px 20px 16px', textAlign: 'center' }}>
+            <div style={{ padding: '8px 10px 12px', textAlign: 'center' }}>
               <button className="win7-btn win7-btn-primary" onClick={() => window.print()}><Printer size={14} style={{ display: 'inline', marginRight: 4 }} />Print</button>
               <button className="win7-btn" style={{ marginLeft: 8 }} onClick={() => setViewing(null)}>Close</button>
             </div>

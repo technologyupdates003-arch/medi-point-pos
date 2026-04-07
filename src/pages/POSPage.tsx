@@ -4,13 +4,15 @@ import { Transaction } from '../store/mockData';
 import { Search, Plus, Minus, X, Printer } from 'lucide-react';
 
 export default function POSPage() {
-  const { products, cart, addToCart, removeFromCart, updateCartQty, clearCart, completeSale, cartTotal, businessSettings } = useApp();
+  const { products, cart, addToCart, removeFromCart, updateCartQty, clearCart, completeSale, cartTotal, businessSettings, currentBranchId, currentUser } = useApp();
   const [search, setSearch] = useState('');
   const [cashPaid, setCashPaid] = useState('');
   const [receipt, setReceipt] = useState<Transaction | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const filtered = products.filter(p =>
+  // Filter products by branch
+  const branchProducts = currentBranchId ? products.filter(p => p.branchId === currentBranchId) : products;
+  const filtered = branchProducts.filter(p =>
     p.name.toLowerCase().includes(search.toLowerCase()) || p.barcode.includes(search)
   );
 
@@ -21,7 +23,6 @@ export default function POSPage() {
     if (tx) {
       setReceipt(tx);
       setCashPaid('');
-      // play a beep
       try {
         const ac = new AudioContext();
         const o = ac.createOscillator();

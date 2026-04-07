@@ -3,16 +3,21 @@ import { useApp } from '../store/AppContext';
 import { Trash2, Plus } from 'lucide-react';
 
 export default function UsersPage() {
-  const { users, addUser, deleteUser, currentUser } = useApp();
+  const { users, addUser, deleteUser, currentUser, branches } = useApp();
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ username: '', password: '', name: '', role: 'cashier' as 'admin' | 'cashier' });
+  const [form, setForm] = useState({ username: '', password: '', name: '', role: 'cashier' as 'admin' | 'cashier', branchId: '' });
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
     if (users.some(u => u.username === form.username)) return;
-    addUser(form);
-    setForm({ username: '', password: '', name: '', role: 'cashier' });
+    addUser({ ...form, branchId: form.branchId || undefined });
+    setForm({ username: '', password: '', name: '', role: 'cashier', branchId: '' });
     setAdding(false);
+  };
+
+  const getBranchName = (branchId?: string) => {
+    if (!branchId) return '—';
+    return branches.find(b => b.id === branchId)?.name || '—';
   };
 
   return (
@@ -26,7 +31,7 @@ export default function UsersPage() {
       <div className="win7-panel" style={{ borderTop: 'none' }}>
         <table className="win7-table">
           <thead>
-            <tr><th>Username</th><th>Name</th><th>Role</th><th style={{ width: 80 }}>Actions</th></tr>
+            <tr><th>Username</th><th>Name</th><th>Role</th><th>Branch</th><th style={{ width: 80 }}>Actions</th></tr>
           </thead>
           <tbody>
             {users.map(u => (
@@ -34,6 +39,7 @@ export default function UsersPage() {
                 <td style={{ fontWeight: 600 }}>{u.username}</td>
                 <td>{u.name}</td>
                 <td><span className={u.role === 'admin' ? 'badge-expired' : 'badge-ok'} style={{ background: u.role === 'admin' ? 'hsl(210,60%,50%)' : 'hsl(120,45%,42%)' }}>{u.role.toUpperCase()}</span></td>
+                <td style={{ fontSize: 11 }}>{getBranchName(u.branchId)}</td>
                 <td>
                   <button
                     className="win7-btn win7-btn-danger"
@@ -74,6 +80,15 @@ export default function UsersPage() {
                   <select className="win7-input" style={{ width: '100%' }} value={form.role} onChange={e => setForm(p => ({ ...p, role: e.target.value as 'admin' | 'cashier' }))}>
                     <option value="cashier">Cashier</option>
                     <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <div style={{ marginBottom: 10 }}>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 600, marginBottom: 2 }}>Assign to Branch</label>
+                  <select className="win7-input" style={{ width: '100%' }} value={form.branchId} onChange={e => setForm(p => ({ ...p, branchId: e.target.value }))}>
+                    <option value="">— Select Branch —</option>
+                    {branches.map(b => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
                   </select>
                 </div>
                 <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>

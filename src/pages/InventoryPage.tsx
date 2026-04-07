@@ -86,13 +86,14 @@ function ProductForm({ initial, onSave, onCancel }: {
 }
 
 export default function InventoryPage() {
-  const { products, addProduct, updateProduct, deleteProduct } = useApp();
+  const { products, addProduct, updateProduct, deleteProduct, currentBranchId } = useApp();
   const [editing, setEditing] = useState<Product | null>(null);
   const [adding, setAdding] = useState(false);
   const [filter, setFilter] = useState('');
 
   const now = new Date();
-  const filtered = products.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+  const branchProducts = currentBranchId ? products.filter(p => p.branchId === currentBranchId) : products;
+  const filtered = branchProducts.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
 
   const getStatus = (p: Product) => {
     if (new Date(p.expiryDate) < now) return 'EXPIRED';

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useApp } from '../store/AppContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, ShoppingCart, Package, ClipboardList, Users, LogOut, AlertTriangle, Settings
+  LayoutDashboard, ShoppingCart, Package, ClipboardList, Users, LogOut, AlertTriangle, Settings, Building2, Wifi, WifiOff, RefreshCw
 } from 'lucide-react';
 
 const adminNav = [
@@ -10,6 +10,7 @@ const adminNav = [
   { label: 'POS', path: '/pos', icon: ShoppingCart },
   { label: 'Inventory', path: '/inventory', icon: Package },
   { label: 'Sales History', path: '/sales', icon: ClipboardList },
+  { label: 'Branches', path: '/branches', icon: Building2 },
   { label: 'Users', path: '/users', icon: Users },
   { label: 'Alerts', path: '/alerts', icon: AlertTriangle },
   { label: 'Settings', path: '/settings', icon: Settings },
@@ -22,10 +23,11 @@ const cashierNav = [
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { currentUser, logout } = useApp();
+  const { currentUser, logout, isOnline, pendingSyncs, lastSync, syncNow, branches, currentBranchId, setCurrentBranchId } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
   const [time, setTime] = useState(new Date());
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -33,6 +35,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   }, []);
 
   const nav = currentUser?.role === 'admin' ? adminNav : cashierNav;
+  const currentBranch = branches.find(b => b.id === currentBranchId);
+
+  const handleSync = async () => {
+    setSyncing(true);
+    await syncNow();
+    setSyncing(false);
+  };
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
@@ -50,6 +59,24 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }}>
           💊 PharmaPOS
         </div>
+
+        {/* Branch selector for admin */}
+        {currentUser?.role === 'admin' && branches.length > 1 && (
+          <div style={{ padding: '6px 8px', borderBottom: '1px solid hsl(210 15% 78%)', background: 'hsl(210 10% 93%)' }}>
+            <select
+              className="win7-input"
+              style={{ width: '100%', fontSize: 11 }}
+              value={currentBranchId || ''}
+              onChange={e => setCurrentBranchId(e.target.value || null)}
+            >
+              <option value="">All Branches</option>
+              {branches.map(b => (
+                <option key={b.id} value={b.id}>{b.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div style={{ flex: 1, paddingTop: 6 }}>
           {nav.map(item => (
             <div
@@ -86,9 +113,57 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           fontSize: 12,
           flexShrink: 0,
         }}>
-          <span>👤 {currentUser?.name} ({currentUser?.role})</span>
-          <span>{time.toLocaleDateString()} — {time.toLocaleTimeString()}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span>👤 {currentUser?.name} ({currentUser?.role})</span>
+            {currentBranch && <span style={{ color: '#666' }}>📍 {currentBranch.name}</span>}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* Sync status */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              {isOnline ? (
+                <Wifi size={14} style={{ color: 'hsl(120 45% 42%)' }} />
+              ) : (
+                <WifiOff size={14} style={{ color: 'hsl(0 70% 50%)' }} />
+              )}
+              <span style={{ color: isOnline ? 'hsl(120 45% 42%)' : 'hsl(0 70% 50%)', fontWeight: 600 }}>
+                {isOnline ? 'Online' : 'Offline'}
+              </span>
+              {pendingSyncs > 0 && (
+                <span style={{ background: 'hsl(40 90% 50%)', color: '#000', padding: '1px 6px', borderRadius: 8, fontSize: 10, fontWeight: 700 }}>
+                  {pendingSyncs} pending
+                </span>
+              )}
+              <button
+                className="win7-btn"
+                style={{ padding: '1px 6px', marginLeft: 2 }}
+                onClick={handleSync}
+                disabled={!isOnline || syncing}
+                title="Sync now"
+              >
+                <RefreshCw size={12} className={syncing ? 'animate-spin' : ''} />
+              </button>
+            </div>
+            <span>{time.toLocaleDateString()} — {time.toLocaleTimeString()}</span>
+          </div>
         </div>
+
+        {/* Offline banner */}
+        {!isOnline && (
+          <div style={{
+            background: 'hsl(40 90% 85%)',
+            borderBottom: '1px solid hsl(40 90% 60%)',
+            padding: '4px 14px',
+            fontSize: 11,
+            fontWeight: 600,
+            color: 'hsl(40 50% 25%)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}>
+            <WifiOff size={12} />
+            Working offline — changes will sync when connection is restored
+          </div>
+        )}
 
         {/* Content */}
         <div style={{ flex: 1, overflow: 'auto', padding: 16, background: 'hsl(210 20% 92%)' }}>

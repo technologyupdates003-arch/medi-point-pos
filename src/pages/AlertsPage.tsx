@@ -2,17 +2,17 @@ import { useApp } from '../store/AppContext';
 import { AlertTriangle } from 'lucide-react';
 
 export default function AlertsPage() {
-  const { products } = useApp();
+  const { products, currentBranchId } = useApp();
   const now = new Date();
-  const lowStock = products.filter(p => p.stock < 10 && p.stock > 0);
-  const outOfStock = products.filter(p => p.stock <= 0);
-  const expired = products.filter(p => new Date(p.expiryDate) < now);
+  const branchProducts = currentBranchId ? products.filter(p => p.branchId === currentBranchId) : products;
+  const lowStock = branchProducts.filter(p => p.stock < 10 && p.stock > 0);
+  const outOfStock = branchProducts.filter(p => p.stock <= 0);
+  const expired = branchProducts.filter(p => new Date(p.expiryDate) < now);
 
   return (
     <div>
       <div className="win7-titlebar">⚠️ Alerts & Warnings</div>
       <div className="win7-panel" style={{ borderTop: 'none', padding: 16 }}>
-        {/* Expired */}
         {expired.length > 0 && (
           <div style={{ marginBottom: 16 }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: 'hsl(0,70%,50%)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -33,7 +33,6 @@ export default function AlertsPage() {
           </div>
         )}
 
-        {/* Low Stock */}
         {lowStock.length > 0 && (
           <div style={{ marginBottom: 16 }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: 'hsl(40,90%,40%)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -54,7 +53,6 @@ export default function AlertsPage() {
           </div>
         )}
 
-        {/* Out of Stock */}
         {outOfStock.length > 0 && (
           <div style={{ marginBottom: 16 }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: 'hsl(0,70%,50%)', marginBottom: 8 }}>
