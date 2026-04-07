@@ -4,7 +4,7 @@ import { Transaction } from '../store/mockData';
 import { Search, Plus, Minus, X, Printer } from 'lucide-react';
 
 export default function POSPage() {
-  const { products, cart, addToCart, removeFromCart, updateCartQty, clearCart, completeSale, cartTotal } = useApp();
+  const { products, cart, addToCart, removeFromCart, updateCartQty, clearCart, completeSale, cartTotal, businessSettings } = useApp();
   const [search, setSearch] = useState('');
   const [cashPaid, setCashPaid] = useState('');
   const [receipt, setReceipt] = useState<Transaction | null>(null);
@@ -189,48 +189,45 @@ export default function POSPage() {
           position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
         }} onClick={() => setReceipt(null)}>
-          <div onClick={e => e.stopPropagation()} style={{ background: 'white', padding: 0, borderRadius: 2 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: 'white', padding: 0, borderRadius: 2, width: 302 }}>
             <div className="win7-titlebar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>Receipt</span>
               <button onClick={() => setReceipt(null)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>✕</button>
             </div>
-            <div className="receipt" style={{ padding: 20 }}>
-              <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 14 }}>💊 PHARMACY POS</div>
-              <div style={{ textAlign: 'center', fontSize: 11 }}>123 Health Street, Medical City</div>
-              <div style={{ borderBottom: '1px dashed #ccc', margin: '8px 0' }} />
-              <div style={{ fontSize: 11 }}>Date: {new Date(receipt.date).toLocaleString()}</div>
-              <div style={{ fontSize: 11 }}>Receipt #: {receipt.id}</div>
-              <div style={{ fontSize: 11 }}>Cashier: {receipt.cashier}</div>
-              <div style={{ borderBottom: '1px dashed #ccc', margin: '8px 0' }} />
-              <table style={{ width: '100%', fontSize: 11 }}>
-                <thead>
-                  <tr><th style={{ textAlign: 'left' }}>Item</th><th>Qty</th><th>Price</th><th style={{ textAlign: 'right' }}>Sub</th></tr>
-                </thead>
-                <tbody>
-                  {receipt.items.map((item, i) => (
-                    <tr key={i}>
-                      <td>{item.name}</td>
-                      <td style={{ textAlign: 'center' }}>{item.qty}</td>
-                      <td style={{ textAlign: 'center' }}>${item.price.toFixed(2)}</td>
-                      <td style={{ textAlign: 'right' }}>${item.subtotal.toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div style={{ borderBottom: '1px dashed #ccc', margin: '8px 0' }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+            <div className="receipt" style={{ padding: '12px 10px', fontFamily: 'monospace', fontSize: 11, width: 280 }}>
+              <div style={{ textAlign: 'center', fontWeight: 700, fontSize: 13 }}>💊 {businessSettings.businessName}</div>
+              <div style={{ textAlign: 'center', fontSize: 10 }}>{businessSettings.address}</div>
+              {businessSettings.phone && <div style={{ textAlign: 'center', fontSize: 10 }}>{businessSettings.phone}</div>}
+              <div style={{ borderBottom: '1px dashed #000', margin: '6px 0' }} />
+              <div style={{ fontSize: 10 }}>Date: {new Date(receipt.date).toLocaleString()}</div>
+              <div style={{ fontSize: 10 }}>Receipt #: {receipt.id}</div>
+              <div style={{ fontSize: 10 }}>Cashier: {receipt.cashier}</div>
+              <div style={{ borderBottom: '1px dashed #000', margin: '6px 0' }} />
+              {receipt.items.map((item, i) => (
+                <div key={i} style={{ marginBottom: 2 }}>
+                  <div style={{ fontSize: 10 }}>{item.name}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                    <span>{item.qty} x ${item.price.toFixed(2)}</span>
+                    <span>${item.subtotal.toFixed(2)}</span>
+                  </div>
+                </div>
+              ))}
+              <div style={{ borderBottom: '1px dashed #000', margin: '6px 0' }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 12 }}>
                 <span>TOTAL</span><span>${receipt.total.toFixed(2)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-                <span>Cash Paid</span><span>${receipt.cashPaid.toFixed(2)}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                <span>Cash</span><span>${receipt.cashPaid.toFixed(2)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
-                <span>Balance</span><span>${receipt.balance.toFixed(2)}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                <span>Change</span><span>${receipt.balance.toFixed(2)}</span>
               </div>
-              <div style={{ borderBottom: '1px dashed #ccc', margin: '8px 0' }} />
-              <div style={{ textAlign: 'center', fontSize: 10 }}>Thank you for your purchase!</div>
+              <div style={{ borderBottom: '1px dashed #000', margin: '6px 0' }} />
+              <div style={{ textAlign: 'center', fontSize: 9 }}>Thank you for your purchase!</div>
+              <div style={{ textAlign: 'center', fontSize: 8, marginTop: 4, color: '#666' }}>Powered by Abancool Technology</div>
+              <div style={{ textAlign: 'center', fontSize: 8, color: '#666' }}>0728825152 / 01116679286</div>
             </div>
-            <div style={{ padding: '8px 20px 16px', textAlign: 'center' }}>
+            <div style={{ padding: '8px 10px 12px', textAlign: 'center' }}>
               <button className="win7-btn win7-btn-primary" onClick={() => window.print()}>
                 <Printer size={14} style={{ marginRight: 4, display: 'inline' }} /> Print
               </button>

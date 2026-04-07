@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
-  Product, CartItem, Transaction, User,
-  initialProducts, initialTransactions, initialUsers
+  Product, CartItem, Transaction, User, BusinessSettings,
+  initialProducts, initialTransactions, initialUsers, defaultBusinessSettings
 } from './mockData';
 
 interface AppState {
@@ -22,6 +22,8 @@ interface AppState {
   deleteProduct: (id: string) => void;
   addUser: (u: Omit<User, 'id'>) => void;
   deleteUser: (id: string) => void;
+  businessSettings: BusinessSettings;
+  updateBusinessSettings: (s: BusinessSettings) => void;
   cartTotal: number;
 }
 
@@ -38,8 +40,8 @@ function loadState() {
   return null;
 }
 
-function saveState(products: Product[], transactions: Transaction[], users: User[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ products, transactions, users }));
+function saveState(products: Product[], transactions: Transaction[], users: User[], businessSettings: BusinessSettings) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ products, transactions, users, businessSettings }));
 }
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
@@ -47,6 +49,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [products, setProducts] = useState<Product[]>(saved?.products || initialProducts);
   const [transactions, setTransactions] = useState<Transaction[]>(saved?.transactions || initialTransactions);
   const [users, setUsers] = useState<User[]>(saved?.users || initialUsers);
+  const [businessSettings, setBusinessSettings] = useState<BusinessSettings>(saved?.businessSettings || defaultBusinessSettings);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const uid = localStorage.getItem('pharmacy_user');
@@ -57,7 +60,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return null;
   });
 
-  useEffect(() => { saveState(products, transactions, users); }, [products, transactions, users]);
+  useEffect(() => { saveState(products, transactions, users, businessSettings); }, [products, transactions, users, businessSettings]);
+
+  const updateBusinessSettings = useCallback((s: BusinessSettings) => {
+    setBusinessSettings(s);
+  }, []);
 
   const login = useCallback((username: string, password: string) => {
     const u = users.find(x => x.username === username && x.password === password);
@@ -143,9 +150,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider value={{
-      currentUser, products, transactions, users, cart,
+      currentUser, products, transactions, users, cart, businessSettings,
       login, logout, addToCart, removeFromCart, updateCartQty, clearCart,
-      completeSale, addProduct, updateProduct, deleteProduct, addUser, deleteUser, cartTotal
+      completeSale, addProduct, updateProduct, deleteProduct, addUser, deleteUser,
+      updateBusinessSettings, cartTotal
     }}>
       {children}
     </AppContext.Provider>

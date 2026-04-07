@@ -71,6 +71,18 @@ export const initialTransactions: Transaction[] = Array.from({ length: 10 }, (_,
   };
 });
 
+export interface BusinessSettings {
+  businessName: string;
+  address: string;
+  phone: string;
+}
+
+export const defaultBusinessSettings: BusinessSettings = {
+  businessName: 'PharmaPOS',
+  address: '123 Health Street, Medical City',
+  phone: '',
+};
+
 export const initialUsers: User[] = [
   { id: 'u1', username: 'admin', password: 'admin123', role: 'admin', name: 'Administrator' },
   { id: 'u2', username: 'cashier', password: '1234', role: 'cashier', name: 'Main Cashier' },

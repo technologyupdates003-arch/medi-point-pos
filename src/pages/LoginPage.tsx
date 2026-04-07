@@ -57,6 +57,11 @@ export default function LoginPage() {
             <div><b>Admin:</b> admin / admin123</div>
             <div><b>Cashier:</b> cashier / 1234</div>
           </div>
+          <div style={{ marginTop: 16, borderTop: '1px solid hsl(210 15% 85%)', paddingTop: 12, textAlign: 'center' }}>
+            <div style={{ fontSize: 10, color: 'hsl(0 0% 55%)' }}>POS Sponsor</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'hsl(210 40% 40%)', marginTop: 2 }}>Powered by Abancool Technology</div>
+            <div style={{ fontSize: 10, color: 'hsl(0 0% 50%)' }}>0728825152 / 01116679286</div>
+          </div>
         </div>
       </div>
     </div>

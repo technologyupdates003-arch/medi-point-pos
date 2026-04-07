@@ -237,3 +237,21 @@
   border: 1px solid hsl(210 10% 60%);
   border-radius: 1px;
 }
+
+@media print {
+  body * { visibility: hidden !important; }
+  .receipt, .receipt * { visibility: visible !important; }
+  .receipt {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    font-family: monospace;
+    font-size: 11px;
+    padding: 4mm;
+  }
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+}

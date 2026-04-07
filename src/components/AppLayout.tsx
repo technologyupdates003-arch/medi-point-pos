@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useApp } from '../store/AppContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, ShoppingCart, Package, ClipboardList, Users, LogOut, AlertTriangle
+  LayoutDashboard, ShoppingCart, Package, ClipboardList, Users, LogOut, AlertTriangle, Settings
 } from 'lucide-react';
 
 const adminNav = [
@@ -12,6 +12,7 @@ const adminNav = [
   { label: 'Sales History', path: '/sales', icon: ClipboardList },
   { label: 'Users', path: '/users', icon: Users },
   { label: 'Alerts', path: '/alerts', icon: AlertTriangle },
+  { label: 'Settings', path: '/settings', icon: Settings },
 ];
 
 const cashierNav = [
