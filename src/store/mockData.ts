@@ -87,6 +87,3 @@ export const initialUsers: User[] = [
   { id: 'u1', username: 'admin', password: 'admin123', role: 'admin', name: 'Administrator' },
   { id: 'u2', username: 'cashier', password: '1234', role: 'cashier', name: 'Main Cashier' },
 ];
-  { id: 'u1', username: 'admin', password: 'admin123', role: 'admin', name: 'Administrator' },
-  { id: 'u2', username: 'cashier', password: '1234', role: 'cashier', name: 'Main Cashier' },
-];
