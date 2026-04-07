@@ -7,6 +7,7 @@ import DashboardPage from './pages/DashboardPage';
 import SalesPage from './pages/SalesPage';
 import UsersPage from './pages/UsersPage';
 import AlertsPage from './pages/AlertsPage';
+import SettingsPage from './pages/SettingsPage';
 import AppLayout from './components/AppLayout';
 
 function AuthenticatedRoutes() {
@@ -27,6 +28,7 @@ function AuthenticatedRoutes() {
         <Route path="/sales" element={<SalesPage />} />
         {isAdmin && <Route path="/users" element={<UsersPage />} />}
         <Route path="/alerts" element={<AlertsPage />} />
+        {isAdmin && <Route path="/settings" element={<SettingsPage />} />}
         <Route path="*" element={<Navigate to={defaultPath} replace />} />
       </Routes>
     </AppLayout>
