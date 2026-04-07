@@ -43,14 +43,15 @@ export async function processQueue(): Promise<number> {
 
   for (const item of queue) {
     try {
+      const table = item.table as any;
       if (item.action === 'insert') {
-        const { error } = await supabase.from(item.table).upsert(item.data);
+        const { error } = await supabase.from(table).upsert(item.data as any);
         if (error) throw error;
       } else if (item.action === 'update') {
-        const { error } = await supabase.from(item.table).upsert(item.data);
+        const { error } = await supabase.from(table).upsert(item.data as any);
         if (error) throw error;
       } else if (item.action === 'delete') {
-        const { error } = await supabase.from(item.table).delete().eq('id', item.data.id);
+        const { error } = await supabase.from(table).delete().eq('id', item.data.id);
         if (error) throw error;
       }
       processed++;
