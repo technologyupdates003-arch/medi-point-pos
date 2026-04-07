@@ -8,6 +8,7 @@ import SalesPage from './pages/SalesPage';
 import UsersPage from './pages/UsersPage';
 import AlertsPage from './pages/AlertsPage';
 import SettingsPage from './pages/SettingsPage';
+import BranchesPage from './pages/BranchesPage';
 import AppLayout from './components/AppLayout';
 
 function AuthenticatedRoutes() {
@@ -26,6 +27,7 @@ function AuthenticatedRoutes() {
         <Route path="/pos" element={<POSPage />} />
         {isAdmin && <Route path="/inventory" element={<InventoryPage />} />}
         <Route path="/sales" element={<SalesPage />} />
+        {isAdmin && <Route path="/branches" element={<BranchesPage />} />}
         {isAdmin && <Route path="/users" element={<UsersPage />} />}
         <Route path="/alerts" element={<AlertsPage />} />
         {isAdmin && <Route path="/settings" element={<SettingsPage />} />}
