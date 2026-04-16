@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import {
   Product, CartItem, Transaction, User, BusinessSettings, Branch,
-  initialProducts, initialTransactions, initialUsers, defaultBusinessSettings, initialBranches
+  defaultBusinessSettings
 } from './mockData';
 import {
   isOnline as checkOnline, processQueue, getPendingCount, getLastSyncTime,
