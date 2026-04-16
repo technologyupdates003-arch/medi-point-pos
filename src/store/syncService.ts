@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Product, Transaction, User, BusinessSettings, Branch } from './mockData';
+import { Product, Transaction, BusinessSettings, Branch } from './mockData';
 
 const SYNC_QUEUE_KEY = 'pharmacy_sync_queue';
 const LAST_SYNC_KEY = 'pharmacy_last_sync';
