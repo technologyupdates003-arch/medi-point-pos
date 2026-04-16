@@ -38,11 +38,10 @@ export default function BranchesPage() {
   };
 
   const getBranchStats = (branchId: string) => {
-    const branchUsers = users.filter(u => u.branchId === branchId);
     const branchProducts = products.filter(p => p.branchId === branchId);
     const branchTx = transactions.filter(t => t.branchId === branchId);
     const revenue = branchTx.reduce((s, t) => s + t.total, 0);
-    return { users: branchUsers.length, products: branchProducts.length, transactions: branchTx.length, revenue };
+    return { users: staffCounts[branchId] || 0, products: branchProducts.length, transactions: branchTx.length, revenue };
   };
 
   return (
