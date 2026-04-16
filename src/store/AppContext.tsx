@@ -61,10 +61,10 @@ function saveState(products: Product[], transactions: Transaction[], users: User
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const saved = loadState();
-  const [products, setProducts] = useState<Product[]>(saved?.products || initialProducts);
-  const [transactions, setTransactions] = useState<Transaction[]>(saved?.transactions || initialTransactions);
-  const [users, setUsers] = useState<User[]>(saved?.users || initialUsers);
-  const [branches, setBranches] = useState<Branch[]>(saved?.branches || initialBranches);
+  const [products, setProducts] = useState<Product[]>(saved?.products || []);
+  const [transactions, setTransactions] = useState<Transaction[]>(saved?.transactions || []);
+  const [users, setUsers] = useState<User[]>(saved?.users || []);
+  const [branches, setBranches] = useState<Branch[]>(saved?.branches || []);
   const [businessSettings, setBusinessSettings] = useState<BusinessSettings>(saved?.businessSettings || defaultBusinessSettings);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [online, setOnline] = useState(checkOnline());
@@ -76,7 +76,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     const uid = localStorage.getItem('pharmacy_user');
     if (uid) {
-      const u = (saved?.users || initialUsers).find((x: User) => x.id === uid);
+      const u = (saved?.users || []).find((x: User) => x.id === uid);
       return u || null;
     }
     return null;
