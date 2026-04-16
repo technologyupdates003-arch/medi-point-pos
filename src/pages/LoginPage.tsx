@@ -1,16 +1,28 @@
 import { useState } from 'react';
-import { useApp } from '../store/AppContext';
+import { supabase } from '@/integrations/supabase/client';
 
-export default function LoginPage() {
-  const { login } = useApp();
-  const [username, setUsername] = useState('');
+interface Props {
+  onGoToRegister: () => void;
+}
+
+export default function LoginPage({ onGoToRegister }: Props) {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!login(username, password)) {
-      setError('Invalid username or password');
+    setError('');
+    setLoading(true);
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) throw signInError;
+      // Auth state change listener in App.tsx will handle navigation
+    } catch (err: any) {
+      setError(err.message || 'Invalid email or password');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -29,13 +41,15 @@ export default function LoginPage() {
         <div className="win7-panel" style={{ padding: 30, borderTop: 'none', borderRadius: '0 0 2px 2px' }}>
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>Username</label>
+              <label style={{ display: 'block', marginBottom: 4, fontWeight: 600 }}>Email</label>
               <input
                 className="win7-input"
+                type="email"
                 style={{ width: '100%' }}
-                value={username}
-                onChange={e => { setUsername(e.target.value); setError(''); }}
+                value={email}
+                onChange={e => { setEmail(e.target.value); setError(''); }}
                 autoFocus
+                required
               />
             </div>
             <div style={{ marginBottom: 16 }}>
@@ -46,16 +60,26 @@ export default function LoginPage() {
                 style={{ width: '100%' }}
                 value={password}
                 onChange={e => { setPassword(e.target.value); setError(''); }}
+                required
               />
             </div>
             {error && <div style={{ color: 'hsl(0 70% 50%)', marginBottom: 12, fontSize: 12 }}>{error}</div>}
-            <button type="submit" className="win7-btn win7-btn-primary" style={{ width: '100%', padding: '8px 16px', fontSize: 14 }}>
-              Log In
+            <button
+              type="submit"
+              className="win7-btn win7-btn-primary"
+              style={{ width: '100%', padding: '8px 16px', fontSize: 14 }}
+              disabled={loading}
+            >
+              {loading ? 'Signing in...' : 'Log In'}
             </button>
           </form>
-          <div style={{ marginTop: 20, fontSize: 11, color: 'hsl(0 0% 50%)', textAlign: 'center' }}>
-            <div><b>Admin:</b> admin / admin123</div>
-            <div><b>Cashier:</b> cashier / 1234</div>
+          <div style={{ marginTop: 14, textAlign: 'center' }}>
+            <button
+              onClick={onGoToRegister}
+              style={{ background: 'none', border: 'none', color: 'hsl(210 60% 45%)', cursor: 'pointer', fontSize: 12, textDecoration: 'underline' }}
+            >
+              Register new business
+            </button>
           </div>
           <div style={{ marginTop: 16, borderTop: '1px solid hsl(210 15% 85%)', paddingTop: 12, textAlign: 'center' }}>
             <div style={{ fontSize: 10, color: 'hsl(0 0% 55%)' }}>POS Sponsor</div>
