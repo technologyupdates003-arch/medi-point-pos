@@ -1,10 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../store/AppContext';
 import { Branch } from '../store/mockData';
 import { Pencil, Trash2, Plus, MapPin, Phone } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function BranchesPage() {
-  const { branches, addBranch, updateBranch, deleteBranch, users, products, transactions } = useApp();
+  const { branches, addBranch, updateBranch, deleteBranch, products, transactions } = useApp();
+  const [staffCounts, setStaffCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    supabase.from('profiles').select('branch_id').then(({ data }) => {
+      const counts: Record<string, number> = {};
+      (data || []).forEach(p => { if (p.branch_id) counts[p.branch_id] = (counts[p.branch_id] || 0) + 1; });
+      setStaffCounts(counts);
+    });
+  }, [branches]);
   const [editing, setEditing] = useState<Branch | null>(null);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ name: '', address: '', phone: '' });
@@ -28,11 +38,10 @@ export default function BranchesPage() {
   };
 
   const getBranchStats = (branchId: string) => {
-    const branchUsers = users.filter(u => u.branchId === branchId);
     const branchProducts = products.filter(p => p.branchId === branchId);
     const branchTx = transactions.filter(t => t.branchId === branchId);
     const revenue = branchTx.reduce((s, t) => s + t.total, 0);
-    return { users: branchUsers.length, products: branchProducts.length, transactions: branchTx.length, revenue };
+    return { users: staffCounts[branchId] || 0, products: branchProducts.length, transactions: branchTx.length, revenue };
   };
 
   return (

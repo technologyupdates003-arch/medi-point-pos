@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Product, Transaction, User, BusinessSettings, Branch } from './mockData';
+import { Product, Transaction, BusinessSettings, Branch } from './mockData';
 
 const SYNC_QUEUE_KEY = 'pharmacy_sync_queue';
 const LAST_SYNC_KEY = 'pharmacy_last_sync';
@@ -124,18 +124,6 @@ export async function fetchTransactions(branchId?: string): Promise<Transaction[
   }));
 }
 
-export async function fetchUsers(): Promise<User[]> {
-  const { data, error } = await supabase.from('app_users').select('*').order('created_at');
-  if (error) { console.error('fetchUsers:', error); return []; }
-  return (data || []).map(u => ({
-    id: u.id,
-    username: u.username,
-    password: u.password,
-    role: u.role as 'admin' | 'cashier',
-    name: u.name,
-    branchId: u.branch_id || undefined,
-  }));
-}
 
 export async function fetchBusinessSettings(): Promise<BusinessSettings | null> {
   const { data, error } = await supabase.from('business_settings').select('*').limit(1).single();
@@ -192,26 +180,6 @@ export async function syncTransaction(tx: Transaction) {
   }
 }
 
-export async function syncUser(user: User, action: 'upsert' | 'delete') {
-  const dbData = {
-    id: user.id,
-    branch_id: user.branchId || null,
-    username: user.username,
-    password: user.password,
-    role: user.role,
-    name: user.name,
-  };
-
-  if (isOnline()) {
-    if (action === 'upsert') {
-      await supabase.from('app_users').upsert(dbData);
-    } else {
-      await supabase.from('app_users').delete().eq('id', user.id);
-    }
-  } else {
-    addToQueue('app_users', action === 'upsert' ? 'update' : 'delete', action === 'delete' ? { id: user.id } : dbData);
-  }
-}
 
 export async function syncBranch(branch: Branch, action: 'upsert' | 'delete') {
   const dbData = {
